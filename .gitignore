@@ -1,0 +1,28 @@
+# Arquivo .gitignore
+
+# Ignorar o arquivo de variáveis de ambiente com segredos
+.env
+
+# Dependências e Binários (gerados pela compilação)
+**/[Bb]in/
+**/[Oo]bj/
+
+# Arquivos de usuário do Visual Studio
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Arquivos do Rider
+.idea/
+*.sln.iml
+
+# Arquivos do VS Code
+.vscode/
+
+# Dados do Docker
+**/[Dd]ocker/publish/
+pgdata/
+
+# Logs
+*.log
