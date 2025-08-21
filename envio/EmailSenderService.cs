@@ -17,9 +17,9 @@ public class EmailSenderService : IEmailSenderService
         _logger = logger;
     }
 
-    public async Task<bool> SendEmailAsync(EmailSchedule email)
+    public async Task<EmailSchedule?> SendEmailAsync(EmailSchedule email)
     {
-        var retryDelays = new[] { TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(25) };
+        var retryDelays = new[] { TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(5) };
 
         for (int i = 0; i < retryDelays.Length; i++)
         {
@@ -43,7 +43,7 @@ public class EmailSenderService : IEmailSenderService
                 await client.DisconnectAsync(true);
 
                 _logger.LogInformation("E-mail ID: {EmailId} enviado com sucesso!", email.Id);
-                return true;
+                return email;
             }
             catch (Exception ex)
             {
@@ -51,6 +51,6 @@ public class EmailSenderService : IEmailSenderService
             }
         }
         _logger.LogError("Todas as {TotalAttempts} tentativas de envio para o e-mail ID {EmailId} falharam.", retryDelays.Length, email.Id);
-        return false;
+        return null;
     }
 }

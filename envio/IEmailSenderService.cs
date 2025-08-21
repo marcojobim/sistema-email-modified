@@ -4,5 +4,5 @@ namespace EnvioWorker;
 
 public interface IEmailSenderService
 {
-    Task<bool> SendEmailAsync(EmailSchedule email);
+    Task<EmailSchedule?> SendEmailAsync(EmailSchedule email);
 }

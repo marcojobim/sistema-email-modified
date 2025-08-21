@@ -31,16 +31,21 @@ public class Worker : BackgroundService
 
                     if (emailsToSend.Any())
                     {
-                        foreach (var email in emailsToSend)
-                        {
-                            bool sendSuccess = await emailSender.SendEmailAsync(email);
+                        var sendTasks = emailsToSend.Select(email => emailSender.SendEmailAsync(email));
 
-                            if (sendSuccess)
+                        var results = await Task.WhenAll(sendTasks);
+
+                        var emailsSended = results.Where(email => email is not null).ToList();
+
+                        if (emailsSended.Any())
+                        {
+                            foreach (var email in emailsSended)
                             {
-                                email.IsSent = true;
+                                email!.IsSent = true;
                             }
+
+                            await dbContext.SaveChangesAsync(stoppingToken);
                         }
-                        await dbContext.SaveChangesAsync(stoppingToken);
                     }
                 }
             }
