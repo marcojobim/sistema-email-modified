@@ -1,0 +1,72 @@
+# docker-swarm.yml
+version: '3.8'
+
+services:
+  frontend:
+    image: marcojobimdev/frontend:v1.0
+    networks:
+      - EmailNetwork
+    ports:
+      - "8080:80"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - "node.labels.role == worker1"
+
+  db_gerenciamento:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: gerenciamento
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: senha_segura
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - EmailNetwork
+    ports:
+      - "5432:5432"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - "node.labels.role == manager"
+
+  gerenciamento:
+    image: marcojobimdev/gerenciamento:v1.0
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db_gerenciamento;Port=5432;Database=gerenciamento;Username=admin;Password=senha_segura"
+    networks:
+      - EmailNetwork
+    ports:
+      - "5000:8080"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - "node.labels.role == manager"
+
+  envio:
+    image: marcojobimdev/envio:v1.0
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db_gerenciamento;Port=5432;Database=gerenciamento;Username=admin;Password=senha_segura"
+      SmtpSettings__Host: "smtp-relay.brevo.com"
+      SmtpSettings__Port: "587"
+      SmtpSettings__Username: "9535ed001@smtp-brevo.com"
+      SmtpSettings__Password: "xsmtpsib-5cf502c292c26e6b38fb02a11ad6f4305633b38f58271260547783bc690b3da4-82WMZhTrzdI0yJwA"
+      SmtpSettings__SenderEmail: "pronanashi1@gmail.com"
+      SmtpSettings__SenderName: "Email Schedule Application"
+    networks:
+      - EmailNetwork
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - "node.labels.role == worker2"
+
+networks:
+  EmailNetwork:
+    driver: overlay
+
+volumes:
+  pgdata:

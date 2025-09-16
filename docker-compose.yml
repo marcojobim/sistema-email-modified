@@ -5,20 +5,16 @@ services:
     ports:
       - "8080:80"
     volumes:
-      # CORREÇÃO: Removido o espaço antes de '.d'
       - ./frontend/index.html:/usr/share/nginx/html/index.html
       - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
     networks:
       - EmailNetwork
-    # MELHORIA: Faz o frontend esperar pela API antes de iniciar
     depends_on:
       - gerenciamento
 
   db_gerenciamento:
-    # CORREÇÃO: Indentação ajustada para o nível correto
     image: postgres:16
     container_name: db_gerenciamento
-    # MELHORIA: Garante que o container reinicie se falhar
     restart: always
     environment:
       - POSTGRES_DB=${DATABASE_NAME}
@@ -78,7 +74,6 @@ services:
       gerenciamento:
         condition: service_healthy
 
-# MELHORIA: Declaração explícita da rede e do volume
 networks:
   EmailNetwork:
     driver: bridge
